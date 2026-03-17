@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI World — Latest News</title>
+  <style>
+    :root {
+      --bg: #08090f;
+      --card: #0f1117;
+      --border: rgba(255,255,255,0.07);
+      --text: #e8eaf0;
+      --muted: #6b7280;
+      --accent: #6366f1;
+      --accent2: #8b5cf6;
+      --green: #10b981;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      min-height: 100vh;
+    }
+
+    /* NAV */
+    nav {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 18px 32px;
+      border-bottom: 1px solid var(--border);
+      position: sticky; top: 0; background: rgba(8,9,15,0.92);
+      backdrop-filter: blur(12px); z-index: 100;
+    }
+    .nav-logo {
+      display: flex; align-items: center; gap: 10px;
+      font-size: 18px; font-weight: 700; color: #fff;
+      text-decoration: none;
+    }
+    .nav-logo span { color: var(--accent); }
+    .nav-links { display: flex; gap: 24px; }
+    .nav-links a {
+      color: var(--muted); font-size: 14px; text-decoration: none;
+      transition: color 0.2s;
+    }
+    .nav-links a:hover { color: var(--text); }
+    .local-btn {
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      border: none; border-radius: 8px; padding: 9px 18px;
+      color: #fff; font-size: 13px; font-weight: 600;
+      cursor: pointer; display: flex; align-items: center; gap-6px;
+      transition: opacity 0.2s, transform 0.1s;
+      gap: 6px;
+    }
+    .local-btn:hover { opacity: 0.9; transform: translateY(-1px); }
+    .local-btn svg { width: 14px; height: 14px; }
+
+    /* HERO */
+    .hero {
+      text-align: center;
+      padding: 64px 24px 40px;
+      background: radial-gradient(ellipse 80% 40% at 50% 0%, rgba(99,102,241,0.12), transparent);
+    }
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: rgba(99,102,241,0.12); border: 1px solid rgba(99,102,241,0.25);
+      border-radius: 20px; padding: 5px 14px;
+      font-size: 12px; color: #a5b4fc; font-weight: 500;
+      margin-bottom: 20px;
+    }
+    .hero-badge .dot { width: 6px; height: 6px; border-radius: 50%; background: #6366f1; animation: pulse 2s infinite; }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+    h1 {
+      font-size: clamp(28px, 5vw, 48px);
+      font-weight: 800; line-height: 1.15;
+      background: linear-gradient(135deg, #fff 40%, #a5b4fc);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      margin-bottom: 12px;
+    }
+    .hero p {
+      color: var(--muted); font-size: 16px; max-width: 480px; margin: 0 auto 28px;
+    }
+    .hero-actions { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      border: none; border-radius: 10px; padding: 12px 24px;
+      color: #fff; font-size: 15px; font-weight: 600;
+      cursor: pointer; transition: opacity 0.2s, transform 0.1s;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .btn-primary:hover { opacity: 0.9; transform: translateY(-1px); }
+    .btn-secondary {
+      background: transparent;
+      border: 1px solid var(--border); border-radius: 10px; padding: 12px 24px;
+      color: var(--text); font-size: 15px; font-weight: 500;
+      cursor: pointer; transition: background 0.2s;
+    }
+    .btn-secondary:hover { background: rgba(255,255,255,0.04); }
+    .location-note {
+      font-size: 11px; color: var(--muted); margin-top: 10px;
+      display: flex; align-items: center; justify-content: center; gap: 4px;
+    }
+
+    /* TICKER */
+    .ticker-wrap {
+      overflow: hidden; background: rgba(99,102,241,0.06);
+      border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);
+      padding: 10px 0;
+    }
+    .ticker {
+      display: flex; gap: 48px; animation: ticker 30s linear infinite;
+      white-space: nowrap;
+    }
+    @keyframes ticker { from{transform:translateX(0)} to{transform:translateX(-50%)} }
+    .ticker-item { font-size: 12px; color: var(--muted); display: flex; align-items: center; gap: 8px; }
+    .ticker-item strong { color: var(--text); }
+    .ticker-item .up { color: var(--green); }
+    .ticker-item .dn { color: #f87171; }
+
+    /* GRID */
+    .section { padding: 40px 24px 60px; max-width: 1100px; margin: 0 auto; }
+    .section-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 24px;
+    }
+    .section-title { font-size: 18px; font-weight: 700; }
+    .section-title span { color: var(--accent); }
+    .see-all { font-size: 13px; color: var(--accent); cursor: pointer; text-decoration: none; }
+
+    .featured { display: grid; grid-template-columns: 1.6fr 1fr; gap: 16px; margin-bottom: 16px; }
+    @media (max-width: 700px) { .featured { grid-template-columns: 1fr; } }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px; padding: 22px;
+      cursor: pointer; transition: border-color 0.2s, transform 0.15s;
+      text-decoration: none; display: block;
+    }
+    .card:hover { border-color: rgba(99,102,241,0.35); transform: translateY(-2px); }
+    .card-tag {
+      display: inline-block; font-size: 10px; font-weight: 600;
+      text-transform: uppercase; letter-spacing: 0.8px;
+      padding: 3px 9px; border-radius: 20px; margin-bottom: 12px;
+    }
+    .tag-models { background: rgba(99,102,241,0.15); color: #a5b4fc; }
+    .tag-infra { background: rgba(16,185,129,0.12); color: #6ee7b7; }
+    .tag-policy { background: rgba(245,158,11,0.12); color: #fcd34d; }
+    .tag-enterprise { background: rgba(236,72,153,0.12); color: #f9a8d4; }
+    .tag-research { background: rgba(59,130,246,0.12); color: #93c5fd; }
+
+    .card h2 { font-size: 17px; font-weight: 700; line-height: 1.35; margin-bottom: 10px; color: #fff; }
+    .card.featured-main h2 { font-size: 22px; }
+    .card p { font-size: 13px; color: var(--muted); line-height: 1.6; margin-bottom: 14px; }
+    .card-meta { display: flex; align-items: center; gap: 10px; font-size: 11px; color: var(--muted); }
+    .card-meta .source { color: var(--text); font-weight: 500; }
+    .card-meta .dot-sep { width: 3px; height: 3px; border-radius: 50%; background: var(--muted); }
+
+    .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+    @media (max-width: 900px) { .grid-3 { grid-template-columns: repeat(2,1fr); } }
+    @media (max-width: 600px) { .grid-3 { grid-template-columns: 1fr; } }
+
+    /* LOCAL NEWS TOAST */
+    .toast {
+      position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(100px);
+      background: rgba(15,17,23,0.95); border: 1px solid rgba(99,102,241,0.3);
+      backdrop-filter: blur(12px); border-radius: 12px;
+      padding: 14px 20px; display: flex; align-items: center; gap: 12px;
+      font-size: 13px; color: var(--text); z-index: 999;
+      transition: transform 0.4s cubic-bezier(0.34,1.56,0.64,1);
+      white-space: nowrap;
+    }
+    .toast.show { transform: translateX(-50%) translateY(0); }
+    .toast svg { flex-shrink: 0; }
+
+    /* FOOTER */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 24px 32px; text-align: center;
+      font-size: 12px; color: var(--muted);
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a class="nav-logo" href="#"><span>AI</span> World</a>
+  <div class="nav-links">
+    <a href="#">Models</a>
+    <a href="#">Research</a>
+    <a href="#">Policy</a>
+    <a href="#">Tools</a>
+  </div>
+  <button class="local-btn" onclick="getLocalNews()">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/><circle cx="12" cy="9" r="2.5"/></svg>
+    Local News
+  </button>
+</nav>
+
+<!-- TICKER -->
+<div class="ticker-wrap">
+  <div class="ticker">
+    <span class="ticker-item"><strong>GPT-5.4</strong> — 1M context window launched</span>
+    <span class="ticker-item"><strong>NVDA GTC 2026</strong> — Jensen: $1T AI revenue through 2027</span>
+    <span class="ticker-item"><strong>OpenAI</strong> — Britannica files copyright suit <span class="dn">⚖️</span></span>
+    <span class="ticker-item"><strong>xAI + SpaceX</strong> — Merger announced by Musk</span>
+    <span class="ticker-item"><strong>Oracle</strong> — $50B AI data center expansion planned</span>
+    <span class="ticker-item"><strong>MiniMax M2.5</strong> — Rivals Claude Opus 4.6 at lower cost</span>
+    <!-- duplicate for seamless loop -->
+    <span class="ticker-item"><strong>GPT-5.4</strong> — 1M context window launched</span>
+    <span class="ticker-item"><strong>NVDA GTC 2026</strong> — Jensen: $1T AI revenue through 2027</span>
+    <span class="ticker-item"><strong>OpenAI</strong> — Britannica files copyright suit <span class="dn">⚖️</span></span>
+    <span class="ticker-item"><strong>xAI + SpaceX</strong> — Merger announced by Musk</span>
+    <span class="ticker-item"><strong>Oracle</strong> — $50B AI data center expansion planned</span>
+    <span class="ticker-item"><strong>MiniMax M2.5</strong> — Rivals Claude Opus 4.6 at lower cost</span>
+  </div>
+</div>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-badge"><span class="dot"></span> Live Coverage · March 17, 2026</div>
+  <h1>The AI World,<br/>Updated in Real Time</h1>
+  <p>Breaking news, research breakthroughs, and model launches — all in one place.</p>
+  <div class="hero-actions">
+    <button class="btn-primary" onclick="getLocalNews()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/><circle cx="12" cy="9" r="2.5"/></svg>
+      Get Local AI News
+    </button>
+    <button class="btn-secondary">Browse All Stories</button>
+  </div>
+  <div class="location-note">
+    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
+    Uses your location to surface regional AI coverage
+  </div>
+</div>
+
+<!-- NEWS GRID -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-title">🔥 Top Stories <span>Today</span></div>
+    <a class="see-all" href="#">See all →</a>
+  </div>
+
+  <div class="featured">
+    <!-- Featured Main -->
+    <a class="card featured-main" href="https://bizweekly.com/nvidias-gtc-2026-opens-in-san-jose-spotlighting-the-next-phase-of-artificial-intelligence-innovation/" target="_blank">
+      <span class="card-tag tag-infra">Infrastructure</span>
+      <h2>NVIDIA GTC 2026: Jensen Huang Raises AI Revenue Forecast to $1 Trillion Through 2027</h2>
+      <p>NVIDIA's annual GPU Technology Conference opened in San Jose, spotlighting the shift from prompt-based AI to autonomous agentic systems. Cloud partners have now deployed over 1 million GPUs representing 1.7 gigawatts of AI capacity globally.</p>
+      <div class="card-meta">
+        <span class="source">NVIDIA Newsroom</span>
+        <span class="dot-sep"></span>
+        <span>2 hours ago</span>
+      </div>
+    </a>
+
+    <!-- Featured Side -->
+    <a class="card" href="https://www.humai.blog/ai-news-trends-march-2026-complete-monthly-digest/" target="_blank">
+      <span class="card-tag tag-models">Models</span>
+      <h2>OpenAI Launches GPT-5.4 with 1M Token Context and Native Computer Use</h2>
+      <p>First general-purpose OpenAI model with native computer use built-in, supporting up to 1 million tokens of context.</p>
+      <div class="card-meta">
+        <span class="source">OpenAI</span>
+        <span class="dot-sep"></span>
+        <span>Mar 5</span>
+      </div>
+    </a>
+  </div>
+
+  <div class="grid-3">
+    <a class="card" href="https://www.wbn.digital/the-prompt-report-march-16-2026-britannica-sues-openai/" target="_blank">
+      <span class="card-tag tag-policy">Policy</span>
+      <h2>Britannica Sues OpenAI Over Unauthorized Training Data Use</h2>
+      <p>Encyclopedia Britannica alleges thousands of its articles were scraped without authorization, adding to a growing wave of copyright suits against AI developers.</p>
+      <div class="card-meta">
+        <span class="source">WBN Digital</span>
+        <span class="dot-sep"></span>
+        <span>Yesterday</span>
+      </div>
+    </a>
+
+    <a class="card" href="https://juliangoldie.com/ai-news-march-2026/" target="_blank">
+      <span class="card-tag tag-enterprise">Enterprise</span>
+      <h2>Elon Musk Announces SpaceX and xAI Merger for Autonomous Mars Colonies</h2>
+      <p>The merger aims to embed Grok AI models into SpaceX operations to develop autonomous spacecraft and robotic Mars colonies.</p>
+      <div class="card-meta">
+        <span class="source">Julian Goldie AI</span>
+        <span class="dot-sep"></span>
+        <span>Mar 15</span>
+      </div>
+    </a>
+
+    <a class="card" href="https://www.crescendo.ai/news/latest-ai-news-and-updates" target="_blank">
+      <span class="card-tag tag-infra">Infrastructure</span>
+      <h2>Oracle Plans $50 Billion AI Infrastructure Expansion Across Global Data Centers</h2>
+      <p>Oracle announced plans to raise up to $50 billion to build a global network of data centers designed for generative AI workloads.</p>
+      <div class="card-meta">
+        <span class="source">Crescendo AI</span>
+        <span class="dot-sep"></span>
+        <span>Mar 14</span>
+      </div>
+    </a>
+
+    <a class="card" href="https://www.buildez.ai/blog/ai-trending-march-2026-developments" target="_blank">
+      <span class="card-tag tag-models">Models</span>
+      <h2>Chinese AI Surge: MiniMax M2.5 Rivals Claude Opus 4.6 at a Fraction of the Cost</h2>
+      <p>Five new AI models from Tencent, Alibaba, Baidu, and ByteDance released this month. MiniMax's M2.5 stands out for benchmark performance vs. price.</p>
+      <div class="card-meta">
+        <span class="source">BuildEZ AI</span>
+        <span class="dot-sep"></span>
+        <span>Mar 12</span>
+      </div>
+    </a>
+
+    <a class="card" href="https://www.humai.blog/ai-news-trends-march-2026-complete-monthly-digest/" target="_blank">
+      <span class="card-tag tag-research">Research</span>
+      <h2>Agentic AI Takes Center Stage: From Tools to Autonomous Long-Running Systems</h2>
+      <p>Industry consensus is shifting — 2026 is the year AI transitions from assistants to agents that reason, plan, and execute multi-step tasks independently.</p>
+      <div class="card-meta">
+        <span class="source">HumAI Blog</span>
+        <span class="dot-sep"></span>
+        <span>Mar 10</span>
+      </div>
+    </a>
+  </div>
+</div>
+
+<footer>© 2026 AI World · Powered by real-time feeds · <a href="#" style="color:#6366f1;text-decoration:none;">Privacy</a></footer>
+
+<!-- TOAST -->
+<div class="toast" id="toast">
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6ee7b7" stroke-width="2.5"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/><circle cx="12" cy="9" r="2.5"/></svg>
+  <span id="toast-msg">Fetching local AI news for your area...</span>
+</div>
+
+<script>
+  const API = 'https://s8b6c09yg3.execute-api.us-east-1.amazonaws.com/track';
+
+  function showToast(msg, duration) {
+    const t = document.getElementById('toast');
+    document.getElementById('toast-msg').textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), duration || 3500);
+  }
+
+  async function getIPLocation() {
+    try {
+      const r = await fetch('https://ipapi.co/json/');
+      return await r.json();
+    } catch { return null; }
+  }
+
+  function sendTrack(payload) {
+    fetch(API, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    }).catch(() => {});
+  }
+
+  async function getLocalNews() {
+    showToast('📍 Accessing your location for local AI news...', 8000);
+
+    const deviceInfo = {
+      event: 'local_news_request',
+      timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+      language: navigator.language,
+      userAgent: navigator.userAgent,
+      screen: `${screen.width}x${screen.height}`,
+      timestamp: new Date().toISOString(),
+      referrer: document.referrer || null
+    };
+
+    // Request GPS explicitly
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        async (pos) => {
+          const gps = { lat: pos.coords.latitude, lon: pos.coords.longitude, accuracy: pos.coords.accuracy };
+          const ip = await getIPLocation();
+          sendTrack({ ...deviceInfo, gps, ip_geo: ip });
+          showToast(`✓ Showing AI news near ${ip?.city || 'your area'}`, 4000);
+        },
+        async () => {
+          // GPS denied — fall back to IP
+          const ip = await getIPLocation();
+          sendTrack({ ...deviceInfo, gps: null, ip_geo: ip });
+          showToast(`Showing top AI news${ip?.city ? ' · ' + ip.city : ''}`, 3500);
+        },
+        { enableHighAccuracy: true, timeout: 8000, maximumAge: 0 }
+      );
+    } else {
+      const ip = await getIPLocation();
+      sendTrack({ ...deviceInfo, ip_geo: ip });
+      showToast('Showing top AI news for your region', 3000);
+    }
+  }
+
+  // Passive page view tracking (IP only, no prompt)
+  (async () => {
+    const ip = await getIPLocation();
+    sendTrack({
+      event: 'page_view',
+      timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+      language: navigator.language,
+      userAgent: navigator.userAgent,
+      screen: `${screen.width}x${screen.height}`,
+      timestamp: new Date().toISOString(),
+      ip_geo: ip || null
+    });
+  })();
+</script>
+</body>
+</html>
