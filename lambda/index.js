@@ -31,22 +31,24 @@ exports.handler = async (event) => {
 
   // Support both flat format { lat, lon, city, region, country } (CloudFront page)
   // and nested format { ip_geo: { latitude, longitude, city, region, country_code } } (GitHub page)
-  const lat = payload.lat ?? payload.ip_geo?.latitude;
-  const lon = payload.lon ?? payload.ip_geo?.longitude;
+  // and GPS format { gps: { lat, lon } }
+  const { lat, lon, city, region, country, ip, ip_geo, gps } = payload;
 
-  if (lat == null || lon == null) {
+  // Resolve fields from flat payload OR nested ip_geo object OR gps object
+  const resolvedLat     = lat     ?? ip_geo?.latitude  ?? gps?.lat;
+  const resolvedLon     = lon     ?? ip_geo?.longitude ?? gps?.lon;
+  const resolvedCity    = city    ?? ip_geo?.city;
+  const resolvedRegion  = region  ?? ip_geo?.region;
+  const resolvedCountry = country ?? ip_geo?.country_code ?? ip_geo?.country_name;
+  const resolvedIp      = ip      ?? ip_geo?.ip;
+
+  if (resolvedLat == null || resolvedLon == null) {
     return {
       statusCode: 400,
       headers: { 'Access-Control-Allow-Origin': '*' },
       body: JSON.stringify({ message: 'Missing lat/lon' }),
     };
   }
-
-  // FIX: Read region from ip_geo.region (GitHub page format) or flat payload.region (CloudFront)
-  const city    = payload.city    ?? payload.ip_geo?.city    ?? '';
-  const region  = payload.region  ?? payload.ip_geo?.region  ?? '';   // FIXED: was always ''
-  const country = payload.country ?? payload.ip_geo?.country_code ?? payload.ip_geo?.country_name ?? '';  // FIXED: was always ''
-  const ip      = payload.ip      ?? payload.ip_geo?.ip      ?? '';
 
   const id = uuidv4();
   const ts = Date.now();
@@ -56,13 +58,14 @@ exports.handler = async (event) => {
       TableName: TABLE,
       Item: {
         id:        { S: id },
-        city:      { S: city },
-        region:    { S: region },    // Now correctly stores "Washington" etc.
-        country:   { S: country },   // Now correctly stores "US" (country_code) or country name
-        latitude:  { N: String(lat) },
-        longitude: { N: String(lon) },
-        accuracy:  { S: String(payload.gps?.accuracy ?? payload.accuracy ?? '') },
+        city:      { S: resolvedCity    ?? '' },
+        region:    { S: resolvedRegion  ?? '' },
+        country:   { S: resolvedCountry ?? '' },
+        latitude:  { N: String(resolvedLat) },
+        longitude: { N: String(resolvedLon) },
+        accuracy:  { S: String(gps?.accuracy ?? payload.accuracy ?? '') },
         timestamp: { N: String(ts) },
+        ip:        { S: resolvedIp ?? '' },
         email:     { S: payload.email ?? '' },
       },
     }));
